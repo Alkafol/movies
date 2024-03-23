@@ -5,6 +5,9 @@ import com.alkafol.movies.dto.MovieDto;
 import com.alkafol.movies.entity.Director;
 import com.alkafol.movies.entity.Movie;
 import com.alkafol.movies.service.DirectorService;
+import com.alkafol.movies.service.MovieService;
+import com.alkafol.movies.validator.DirectorValidator;
+import com.alkafol.movies.validator.MovieValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,9 +18,11 @@ import java.util.stream.Collectors;
 @Component
 public class MovieConverterImpl implements MovieConverter {
     private final DirectorService directorService;
+    private final MovieValidator movieValidator;
 
-    public MovieConverterImpl(DirectorService directorService) {
+    public MovieConverterImpl(DirectorService directorService, MovieValidator movieValidator) {
         this.directorService = directorService;
+        this.movieValidator = movieValidator;
     }
 
     @Override
@@ -28,14 +33,17 @@ public class MovieConverterImpl implements MovieConverter {
         );
 
         return movieDtos.stream().map(
-                movieDto -> new Movie(
-                        movieDto.id(),
-                        movieDto.title(),
-                        movieDto.year(),
-                        directors.get(movieDto.director()),
-                        movieDto.length(),
-                        movieDto.rating()
-                )
+                movieDto -> {
+                    movieValidator.validate(movieDto);
+                    return new Movie(
+                            movieDto.id(),
+                            movieDto.title(),
+                            movieDto.year(),
+                            directors.get(movieDto.director()),
+                            movieDto.length(),
+                            movieDto.rating()
+                    );
+                }
         ).toList();
     }
 

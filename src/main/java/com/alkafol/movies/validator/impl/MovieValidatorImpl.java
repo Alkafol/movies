@@ -1,23 +1,22 @@
 package com.alkafol.movies.validator.impl;
 
 import com.alkafol.movies.dto.MovieDto;
+import com.alkafol.movies.exception.MovieValidationException;
 import com.alkafol.movies.validator.MovieValidator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MovieValidatorImpl implements MovieValidator {
     @Override
-    public Boolean validate(MovieDto movieDto) {
+    public void validate(MovieDto movieDto) {
         if (movieDto.rating() > 10 || movieDto.rating() < 0) {
-            return false;
+            throw new MovieValidationException("Invalid rating");
         }
         if (movieDto.title().length() > 100) {
-            return false;
+            throw new MovieValidationException("Invalid title length");
         }
         if (movieDto.year() > 2100 || movieDto.year() < 1900) {
-            return false;
+            throw new MovieValidationException("Invalid year");
         }
-
-        return true;
     }
 }
